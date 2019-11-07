@@ -1,1 +1,7 @@
 https://norvig.com/spell-correct.html
+https://www.datamuse.com/api/
+https://phrasefinder.io/search?query=hell%20boy&corpus=eng-us
+https://medium.com/@pranavbhatia_26901/create-your-own-e-book-dictionary-using-python-and-nltk-library-f70b4031310e
+http://www.nltk.org/howto/wordnet.html
+https://www.nltk.org/book/ch02.html
+http://www.idc.iitb.ac.in/about/lingo.html
