@@ -12,13 +12,16 @@ def textToWords(text):
 	return re.findall(r'\w+', text.lower())
 
 # It basically maintains a counter, i.e., each entry is a word and frequency of the word
-# from the text file 'big.txt' 
+# from the text file 'big.txt' which basically has some random data
 WORDS = Counter(textToWords(open('big.txt').read()))
 
-# DIC is basically my english dictionary. It is a list of all english words. 
+# DIC is basically my english dictionary. It is a list of all english words.Also we have added
+# all the words in the file 'big.txt' in the dictionary 
 DIC = set(words.words())
 DIC = DIC.union(set(textToWords(open('big.txt').read())))
+DIC = DIC.union(set(textToWords(open('verb.txt').read())))
 
+# total number of words in 'big.txt'
 N=sum(WORDS.values())
 
 # It returns all edits that are one edit away from the parameter word
@@ -39,9 +42,11 @@ def edits2(word):
 def known(words):
 	return set(w for w in words if w in DIC)
 
+# It returns probability of a word by finding its frequency in 'big.txt'
 def P(word):
 	return WORDS[word] / N
 
+# It returns n most probable words from the set of words
 def maximumProbable(words,n):
 	if(len(words)<=n):
 		return words
@@ -54,6 +59,7 @@ def maximumProbable(words,n):
 		i+=1
 	return s
 
+# It returns the list of corrected words for a given word
 def candidates(word):
 	if(len(known([word]))!=0):
 		return []
@@ -62,6 +68,7 @@ def candidates(word):
 		return maximumProbable(s1,numIncorr)
 	s2=known(edits2(word))
 	return s1.union(maximumProbable(s2.difference(s1),numIncorr-len(s1)))
+
 for x in textToWords(open(sys.argv[1]).read()):
 	l = list(known(candidates(x)))
 	print("{} - {}".format(x,l))
