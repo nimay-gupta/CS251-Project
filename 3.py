@@ -36,6 +36,8 @@ WORDS = list(map(lambda x: x.lower(), WORDS))
 
 #now WORDS = list of puncts and lower-cased words in arg text
 
+print(WORDS)
+
 for w in range(len(WORDS)):
 
 	if WORDS[w] in puncts:
