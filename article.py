@@ -4,6 +4,8 @@
 
 # Based on the Ruby Linguistics module by Michael Granger:
 # http://www.deveiate.org/projects/Linguistics/wiki/English
+import re
+import requests
 
 article_rules = [        
 
@@ -29,32 +31,31 @@ article_rules = [
 ]
 
 def article(word):
-    
-    """ Returns the indefinite article for a given word.
-    
-    For example: university -> a university.
-    
-    """
-
-    import re
     for rule in article_rules:
         pattern, article = rule
         if re.search(pattern, word) is not None:
-            return article + " " + word
+            return article
 
-def a(word): 
-    return article(word)
+sentence = "I am a uncle. I ate the apple in a morning."
+print(sentence)
 
-def an(word):
-    return article(word)
+puncts = ['.', '!', ',', ';', '"', "'", '(', ')', '-', '[', ']', '{', '}', '?', '/', ':', '@', '&']
 
-print (article("maggu"))        
-#print article("FBI")
-#print article("bear")
-#print article("one-liner")
-#print article("european")
-#print article("university")
-#print article("uterus")
-#print article("owl")
-#print article("yclept")
-#print article("year")
+for i in puncts:
+    sentence = sentence.replace(i, ' '+i+' ')
+
+WORDS = sentence.split()
+
+for i in range(len(WORDS)):
+    if WORDS[i] == 'a' or WORDS[i] == 'an' or WORDS[i] == 'the':
+        art = article(WORDS[i+1])
+        q = "https://api.datamuse.com/words?sp="
+        response = requests.get(q+art+"&rc="+WORDS[i+1])
+        f1 = response.json()[0]["score"]
+        response = requests.get(q+"the&rc="+WORDS[i+1])
+        f2 = response.json()[0]["score"]
+        #print(i+1," ",f1," ",f2)
+        if(f2 > 7*f1):
+            art = "the"
+        if(art != WORDS[i]):
+            print([i+1,WORDS[i],[art]])
