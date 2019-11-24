@@ -10,18 +10,18 @@ import urllib
 # response = requests.get(q)
 
 
-phrase = sys.argv[1] + ' ' + sys.argv[2] + ' ' + sys.argv[3]
+def phraseScore(phrase):
 
-encoded_query = urllib.parse.quote(phrase)
-params = {'corpus': 'eng-gb', 'query': encoded_query}
-params = '&'.join('{}={}'.format(name, value) for name, value in params.items())
+	encoded_query = urllib.parse.quote(phrase)
+	params = {'corpus': 'eng-gb', 'query': encoded_query}
+	params = '&'.join('{}={}'.format(name, value) for name, value in params.items())
 
-response = requests.get('https://api.phrasefinder.io/search?' + params)
-assert response.status_code == 200
+	response = requests.get('https://api.phrasefinder.io/search?' + params)
+	assert response.status_code == 200
 
-if len(response.json()["phrases"]) > 0:
-	freq = response.json()["phrases"][0]["mc"]
-else:
-	freq = 0
+	if len(response.json()["phrases"]) == 0:
+		ans = 0
+	else:
+		ans = response.json()["phrases"][0]["mc"]
 
-print(freq)
+	return ans

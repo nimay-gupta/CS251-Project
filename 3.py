@@ -3,6 +3,62 @@ from nltk.corpus import wordnet
 import sys
 import requests
 import re
+from nltk.data import find
+from bllipparser import RerankingParser
+import freq
+
+sentence = "I bought a red new bike, Machax!"
+
+################## Forming a parse tree ##################
+model_dir = find('models/bllip_wsj_no_aux').path
+parser = RerankingParser.from_unified_model_dir(model_dir)
+#{'language': 'En', 'case_insensitive': False, 'nbest': 5, 'small_corpus': True, 'overparsing': 21, 'debug': 0, 'smooth_pos': 0}
+parser.set_parser_options(nbest=2,case_insensitive=True)
+l = parser.parse(sentence)
+Trees=[]
+for x in l:
+	Trees+=x.ptb_parse
+print(Trees)
+
+def rem_dupl(l):
+	ans=[]
+	for x in l:
+		a=0
+		for y in ans:
+			if(y[0]==x[0]):
+				a=1
+				break
+		if(a==0):
+			ans+=[x]
+	return ans
+
+def find_syn(tree,cnt):
+	if(len(tree)==0):
+		STR=str(tree)
+		if((STR[1]=='J' and STR[2]=='J') or (STR[1]=='N' and STR[2]=='N') or True):
+			s=STR.split()
+			s1=s[1]
+			if(STR[1]=='J'):
+				return [cnt+1,[[cnt,s1[:len(s1)-1]]]]
+			else:
+				return [cnt+1,[[cnt,s1[:len(s1)-1]]]]
+		return [cnt+1,[]]
+	ans=[]
+	for x in tree:
+		l=find_syn(x,cnt)
+		cnt=l[0]
+		ans+=l[1]
+	return [cnt,ans]
+synlist=[]
+try:
+	for x in range(2):
+		synlist+=find_syn(Trees[x],1)[1]
+except:
+	a=0
+synlist=rem_dupl(synlist)
+synlist = list(map(lambda x: x[1], synlist))
+
+print(synlist)
 
 #dictionary of iitb lingo
 iitb_lingo = {
@@ -24,41 +80,43 @@ iitb_lingo = {
 #list of common launguage punctuations and symbols
 puncts = ['.', '!', ',', ';', '"', "'", '(', ')', '-', '[', ']', '{', '}', '?', '/', ':', '@', '&']
 
-s = open(sys.argv[1]).read()
+# s = open(sys.argv[1]).read()
 
 #done to split puncts separately
 for i in puncts:
-	s = s.replace(i, ' '+i+' ')
-s = s.replace('\n', ' ')
+	sentence = sentence.replace(i, ' '+i+' ')
+# sentence = sentence.replace('\n', ' ')
 
-WORDS = s.split()
-WORDS = list(map(lambda x: x.lower(), WORDS))
+WORDS = sentence.split()
+# WORDS = list(map(lambda x: x.lower(), WORDS))
 
 #now WORDS = list of puncts and lower-cased words in arg text
 
 print(WORDS)
 
-for w in range(len(WORDS)):
+it = 1
+for w in synlist:
 
-	if WORDS[w] in puncts:
+	while(WORDS[it-1] != w):
+		it = it + 1
+
+	if w in puncts:
 		continue
 
-	print(WORDS[w], end=": ")
-
-	if WORDS[w] in iitb_lingo:
-		print(iitb_lingo[WORDS[w]])
+	if w.lower() in iitb_lingo:
+		print([it, w, [iitb_lingo[w.lower()]]])
 
 	else:
 
 		synonyms = []
 
-		q = "https://api.datamuse.com/words?ml="+WORDS[w]
+		q = "https://api.datamuse.com/words?ml=" + w
 
 		#building trigram such that adjacent words shouldn't be iitb lingo or punctuation
-		if w > 0 and not(WORDS[w-1] in iitb_lingo) and not(WORDS[w-1] in puncts):
-			q = q + '&lc=' + WORDS[w-1]
-		if w < len(WORDS)-1 and not(WORDS[w+1] in iitb_lingo) and not(WORDS[w+1] in puncts):
-			q = q + '&rc=' + WORDS[w+1]
+		if it > 1 and not(WORDS[it-2] in iitb_lingo) and not(WORDS[it-2] in puncts):
+			q = q + '&lc=' + WORDS[it-2]
+		if it < len(WORDS) and not(WORDS[it] in iitb_lingo) and not(WORDS[it] in puncts):
+			q = q + '&rc=' + WORDS[it]
 
 		response = requests.get(q)
 		l = response.json()
@@ -99,4 +157,4 @@ for w in range(len(WORDS)):
 
 
 		#top 5 synonyms
-		print(synonyms[:5])
+		print([it, w, synonyms[:3]])
