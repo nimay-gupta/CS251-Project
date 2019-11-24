@@ -22,3 +22,4 @@ def phraseScore(phrase):
 	else:
 		ans = response.json()['phrases'][0]['mc']
 	return ans
+
