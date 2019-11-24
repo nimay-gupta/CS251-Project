@@ -12,7 +12,7 @@ featuresets = [(dialogue_act_features(post.text), post.get('class')) for post in
 size = int(len(featuresets) * 0.1)
 train_set, test_set = featuresets[size:], featuresets[:size]
 classifier = nltk.NaiveBayesClassifier.train(train_set)
-temp=classifier.classify(dialogue_act_features("what are your goals in this life."))
+temp=classifier.classify(dialogue_act_features(""))
 if(temp[len(temp)-8:]=="Question"):
 	print("N")
 else:

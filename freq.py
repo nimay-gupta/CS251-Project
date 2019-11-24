@@ -1,15 +1,6 @@
 import sys
 import requests
 import urllib
-
-
-# q = "https://api.datamuse.com/words?md=f&sp="+sys.argv[2]
-# q = q + '&lc=' + sys.argv[1]
-# q = q + '&rc=' + sys.argv[3]
-
-# response = requests.get(q)
-
-
 def phraseScore(phrase):
 
 	encoded_query = urllib.parse.quote(phrase)
@@ -25,3 +16,4 @@ def phraseScore(phrase):
 		ans = response.json()["phrases"][0]["mc"]
 
 	return ans
+

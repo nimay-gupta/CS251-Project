@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import urllib
 from nltk.corpus import wordnet
 import sys
@@ -158,3 +159,4 @@ for w in synlist:
 
 		#top 5 synonyms
 		print([it, w, synonyms[:3]])
+
