@@ -68,7 +68,11 @@ def candidates(word):
 		return maximumProbable(s1,numIncorr)
 	s2=known(edits2(word))
 	return s1.union(maximumProbable(s2.difference(s1),numIncorr-len(s1)))
-
+count=1
 for x in textToWords(open(sys.argv[1]).read()):
 	l = list(known(candidates(x)))
-	print("{} - {}".format(x,l))
+	if(len(l)==0):
+		count+=1
+		continue
+	print([count,x,l])
+	count+=1

@@ -9,16 +9,16 @@ import urllib
 
 # response = requests.get(q)
 
+def phraseScore(phrase):
+	encoded_query = urllib.parse.quote(phrase)
+	params = {'corpus': 'eng-gb', 'query': encoded_query}
+	params = '&'.join('{}={}'.format(name, value) for name, value in params.items())
 
-phrase = sys.argv[1] + ' ' + sys.argv[2] + ' ' + sys.argv[3]
+	response = requests.get('https://api.phrasefinder.io/search?' + params)
+	assert response.status_code == 200
 
-encoded_query = urllib.parse.quote(phrase)
-params = {'corpus': 'eng-gb', 'query': encoded_query}
-params = '&'.join('{}={}'.format(name, value) for name, value in params.items())
-
-response = requests.get('https://api.phrasefinder.io/search?' + params)
-assert response.status_code == 200
-
-
-l = response.json()
-print(l)
+	if len(response.json()['phrases']) == 0:
+		ans = 0
+	else:
+		ans = response.json()['phrases'][0]['mc']
+	return ans
