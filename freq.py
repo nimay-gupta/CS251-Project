@@ -19,6 +19,9 @@ params = '&'.join('{}={}'.format(name, value) for name, value in params.items())
 response = requests.get('https://api.phrasefinder.io/search?' + params)
 assert response.status_code == 200
 
+if len(response.json()["phrases"]) > 0:
+	freq = response.json()["phrases"][0]["mc"]
+else:
+	freq = 0
 
-l = response.json()
-print(l)
+print(freq)
