@@ -84,7 +84,12 @@ for x in inp:
 	if count < len(inp):
 		rc = " " + inp[count]
 	for w in l:
-		f.append(freq.phraseScore(lc+w+rc)*40 + freq.phraseScore(lc+w) + freq.phraseScore(w+rc))
+		val = freq.phraseScore(lc+w+rc)*40
+		if(lc!=""):
+			val += freq.phraseScore(lc+w)
+		if(rc!=""):
+			val += freq.phraseScore(w+rc)
+		f.append(val)
 	zipped = list(zip(l,f))
 	zipped = sorted(zipped, key = lambda x: x[1], reverse = True)
 	l = list(map(lambda x: x[0], zipped))
