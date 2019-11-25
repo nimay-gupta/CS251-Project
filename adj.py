@@ -1,20 +1,23 @@
 from nltk.data import find
 from bllipparser import RerankingParser
 import freq
-
+import sys
+import re
 ################## Forming a parse tree ##################
+def textToWords(text):
+	return re.findall(r'\w+', text.lower())
+sentence=textToWords(open(sys.argv[1]).read())
 model_dir = find('models/bllip_wsj_no_aux').path
 parser = RerankingParser.from_unified_model_dir(model_dir)
 #{'language': 'En', 'case_insensitive': False, 'nbest': 5, 'small_corpus': True, 'overparsing': 21, 'debug': 0, 'smooth_pos': 0}
 parser.set_parser_options(nbest=2,case_insensitive=True)
-l = parser.parse("I bought, one red new bike.")
+l = parser.parse(sentence)
 Trees=[]
 for x in l:
 	Trees+=x.ptb_parse
-print(Trees)
 
 def sortSecond(val):
-	return val[1]
+	return val[0]
 
 def rem_dupl(l):
 	ans=[]
@@ -60,7 +63,7 @@ while i <len(listadj):
 	if(len(listadj[i])==3):
 		j=i
 		temp=listadj[i][1]
-		while(len(listadj[i+1])==3 and i+1<len(listadj) and listadj[i][0]+1==listadj[i+1][0]):
+		while(i+1<len(listadj) and len(listadj[i+1])==3 and listadj[i][0]+1==listadj[i+1][0]):
 			i+=1
 			temp=temp+" "+listadj[i][1]
 		l=l+[[listadj[j][0]-diff,temp,1]]
@@ -69,7 +72,6 @@ while i <len(listadj):
 	else:
 		l=l+[[listadj[i][0]-diff,listadj[i][1]]]
 		i+=1
-print(l)
 
 
 i = 0
@@ -81,6 +83,29 @@ while i < len(l):
 		if freq.phraseScore(l[i+1][1] + ' ' + l[i][1]):
 			print(l[i][1] + ' ' + l[i+1][1] + ' -> ' + l[i+1][1] + ' ' + l[i][1])
 	elif x-i == 2:
+		if(len(l[i])==3):
+			if freq.phraseScore(l[i+2][1] + ' ' + l[i+1][1]):
+				print(l[i][1] + ' ' + l[i+1][1] + ' ' + l[i+2][1] + ' -> ' + l[i][1] + ' ' + l[i+2][1] + ' ' + l[i+1][1])
+				i=x+1
+				continue
+		if(len(l[i+1])==3):
+			if freq.phraseScore(l[i][1] + ' ' + l[i+2][1]) > freq.phraseScore(l[i+2][1] + ' ' + l[i][1]):
+				print(l[i][1] + ' ' + l[i+1][1] + ' ' + l[i+2][1] + ' -> ' + l[i+1][1] + ' ' + l[i][1] + ' ' + l[i+2][1])
+				i=x+1
+				continue
+			else:
+				print(l[i][1] + ' ' + l[i+1][1] + ' ' + l[i+2][1] + ' -> ' + l[i+1][1] + ' ' + l[i+2][1] + ' ' + l[i][1])
+				i=x+1
+				continue
+		if(len(l[i+2])==3):
+			if freq.phraseScore(l[i+1][1] + ' ' + l[i][1]) > freq.phraseScore(l[i][1] + ' ' + l[i+1][1]):
+				print(l[i][1] + ' ' + l[i+1][1] + ' ' + l[i+2][1] + ' -> ' + l[i+2][1] + ' ' + l[i+1][1] + ' ' + l[i][1])
+				i=x+1
+				continue
+			else:
+				print(l[i][1] + ' ' + l[i+1][1] + ' ' + l[i+2][1] + ' -> ' + l[i+2][1] + ' ' + l[i][1] + ' ' + l[i+1][1])
+				i=x+1
+				continue
 		origi = l[i][1] + ' ' + l[i+1][1] + ' ' + l[i+2][1]
 		one = l[i][1] + ' ' + l[i+2][1] + ' ' + l[i+1][1]
 		two = l[i+2][1] + ' ' + l[i][1] + ' ' + l[i+1][1]
@@ -95,10 +120,17 @@ while i < len(l):
 		perms.append(four)
 		perms.append(five)
 		scor = []
+		max_word=origi
+		max_sc=0
 		for it in range(6):
-			scor.append(freq.phraseScore(perms[it]))
+			temp=freq.phraseScore(perms[it])
+			scor.append(temp)
+			if(max_sc<temp):
+				max_word=perms[it]
+				max_sc=temp
 		zipped = list(zip(perms,scor))
 		zipped = sorted(zipped, key = lambda x: x[1], reverse = True)
 		out = zipped[0][0]
-		print(zipped)
+		if(origi!=max_word):
+			print(origi+' -> '+max_word)
 	i = x + 1

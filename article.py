@@ -55,7 +55,7 @@ for i in range(len(WORDS)):
         response = requests.get(q+"the&rc="+WORDS[i+1])
         f2 = response.json()[0]["score"]
         #print(i+1," ",f1," ",f2)
-        if(f2 > 7*f1):
+        if(f2 > 4*f1):
             art = "the"
         if(art != WORDS[i]):
             print([i+1,WORDS[i],[art]])

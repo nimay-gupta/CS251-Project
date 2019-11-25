@@ -15,6 +15,8 @@ l = parser.parse(sentence)
 Trees=[1,2]
 Trees[0]=l.get_reranker_best().ptb_parse
 Trees[1]=l.get_parser_best().ptb_parse
+S1=sentence
+S1=S1.split()
 sentence=textToWords(sentence)
 ################# finding all proper nouns in a sentence #################
 def sortSecond(val): 
@@ -66,6 +68,8 @@ listpronoun=rem_dupl(listpronoun)
 listpronoun.sort(key = sortSecond)
 dempronoun1=set(["this","these"])
 dempronoun2=set(["that","those"])
+ANS={}
+tempans=[]
 for x in listpronoun:
 	ans=[]
 	ans1=[]
@@ -98,6 +102,7 @@ for x in listpronoun:
 			i+=1
 		if(len(ans1)==0):
 			continue
+		#tempans=tempans+[[x[1]-1,ans1]]
 		print([x[1],x[0],ans1])
 	if x[0] in dempronoun2:
 		for y in dempronoun2:
@@ -128,4 +133,17 @@ for x in listpronoun:
 			i+=1
 		if(len(ans1)==0):
 			continue
+		#tempans=tempans+[[x[1]-1,ans1]]
 		print([x[1],x[0],ans1])
+# tempans.sort()
+# j=0
+# i=0
+# while(i<len(S1)):
+# 	if(j==len(tempans) or i!=tempans[j][0]):
+# 		ANS[S1[i]]=[]
+# 		i+=1
+# 		continue
+# 	ANS[S1[i]]=tempans[j][1]
+# 	j+=1
+# 	i+=1
+# print(ANS)

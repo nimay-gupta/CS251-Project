@@ -18,6 +18,8 @@ sentence=textToWords(sentence)
 ################# finding all proper nouns in a sentence #################
 def lowercase(s):
 	for x in s:
+		if(x>='0' and x<'9'):
+			return True
 		if(x<'a' or x>'z'):
 			return False
 	return True
@@ -51,7 +53,7 @@ def find_proper_noun(tree,cnt):
 		if(STR[1]=='N' and STR[2]=='N' and STR[3]=='P'):
 			s=STR.split()
 			s1=s[1]
-			return [cnt+1,[[s1[:len(s1)-1],cnt]]]
+			return [cnt+1,[[s1[:len(s1)-1].lower(),cnt]]]
 		return [cnt+1,[]]
 	ans=[]
 	for x in tree:
@@ -67,33 +69,32 @@ except:
 	a=0
 listnoun=rem_dupl(listnoun)
 listnoun.sort(key = sortSecond)
-print(listnoun)
 index=0
 ans=[]
 i=0
-while(i<len(sentence) and index<len(listnoun)):
+while(i<len(sentence)):
 	if(i==0):
 		if(lowercase1(sentence[i])):
 			if(i+1==listnoun[index][1]):
 				index+=1
 			i+=1
 			continue
-		ans=ans+[[i+1,sentence[i],getlowercase1(sentence[i])]]
+		ans=ans+[[i+1,sentence[i],[getlowercase1(sentence[i])]]]
 		i+=1
 		continue
-	if(i+1==listnoun[index][1]):
+	if(index<len(listnoun) and i+1==listnoun[index][1]):
 		index+=1
 		if(lowercase1(sentence[i])):
 			i+=1
 			continue
-		ans=ans+[[i+1,sentence[i],getlowercase1(sentence[i])]]
+		ans=ans+[[i+1,sentence[i],[getlowercase1(sentence[i])]]]
 		i+=1
 		continue
 	else:
 		if(lowercase(sentence[i])):
 			i+=1
 			continue
-		ans=ans+[[i+1,sentence[i],getlowercase(sentence[i])]]
+		ans=ans+[[i+1,sentence[i],[getlowercase(sentence[i])]]]
 		i+=1
 		continue
 print(ans)

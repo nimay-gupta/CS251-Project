@@ -1,6 +1,5 @@
 from nltk.data import find
 from bllipparser import RerankingParser
-import os
 import freq
 import sys
 import re
@@ -19,15 +18,17 @@ Trees[1]=l.get_parser_best().ptb_parse
 S1=sentence
 S1=S1.split()
 sentence=textToWords(sentence)
-################# Tense correction for all types of verbs ###############
+################# finding all proper nouns in a sentence #################
 def sortSecond(val): 
     return val[1]
 def get_phrase(index,word):
 	ans=word
-	if(index!=0):
-		ans=sentence[index-1]+" "+ans
 	if(index!=len(sentence)-1):
 		ans=ans+" "+sentence[index+1]
+	if(index!=len(sentence)-2):
+		ans=ans+" "+sentence[index+2]
+	if(index!=len(sentence)-3):
+		ans=ans+" "+sentence[index+3]
 	return ans
 def get_phrase1(index,word):
 	ans=word
@@ -36,8 +37,10 @@ def get_phrase1(index,word):
 	return ans
 def get_phrase2(index,word):
 	ans=word
-	if(index!=0):
-		ans=sentence[index-1]+" "+ans
+	if(index!=len(sentence)-1):
+		ans=ans+" "+sentence[index+1]
+	if(index!=len(sentence)-2):
+		ans=ans+" "+sentence[index+2]
 	return ans
 def rem_dupl(l):
 	ans=[]
@@ -50,83 +53,65 @@ def rem_dupl(l):
 		if(a==0):
 			ans+=[x]
 	return ans
-def find_verb(tree,cnt):
+def find_pronoun(tree,cnt):
 	if(len(tree)==0):
 		STR=str(tree)
-		if(STR[1]=='V'):
+		if(STR[1]=='I' and STR[2]=='N'):
 			s=STR.split()
 			s1=s[1]
 			return [cnt+1,[[s1[:len(s1)-1].lower(),cnt]]]
 		return [cnt+1,[]]
 	ans=[]
 	for x in tree:
-		l=find_verb(x,cnt)
+		l=find_pronoun(x,cnt)
 		cnt=l[0]
 		ans+=l[1]
 	return [cnt,ans]
-
-path = os.path.join(os.path.dirname(__file__), "verb.txt")
-data = open(path).readlines()
-verbs={}
-verbs_inf={}
-for i in range(len(data)):
-    a = data[i].strip().split(",")
-    a = a[:12]
-    l1=[]
-    for x in a:
-    	if(x==""):
-    		continue
-    	verbs_inf[x]=a[0]
-    	l1+=[x]
-    l1=list(set(l1))
-    verbs[a[0]]=l1
-listverb=[]
+listpronoun=[]
 try:
-	listverb+=find_verb(Trees[0],1)[1]
-	listverb+=find_verb(Trees[1],1)[1]
+	for x in range(2):
+		listpronoun+=find_pronoun(Trees[x],1)[1]
 except:
 	a=0
-listverb=rem_dupl(listverb)
-listverb.sort(key = sortSecond)
+listpronoun=rem_dupl(listpronoun)
+listpronoun.sort(key = sortSecond)
+intpronoun=set(["in","on","at","under","toward","of","off","onto","near","into","besides","beside"])
 ANS={}
 tempans=[]
-for x in listverb:
-	try:
-		v=verbs_inf[x[0]]
-	except:
-		continue
+for x in listpronoun:
 	ans=[]
 	ans1=[]
-	for y in verbs[v]:
-		score=0
-		if(y==x[0]):
-			score=freq.phraseScore(get_phrase(x[1]-1,y))*3
-		else:
-			score=freq.phraseScore(get_phrase(x[1]-1,y))
-		if(score!=0):
-			ans=ans+[[score,y]]
-	if(len(ans)==0):
-		for y in verbs[v]:
+	if x[0] in intpronoun:
+		for y in intpronoun:
 			score=0
 			if(y==x[0]):
-				score=freq.phraseScore(get_phrase1(x[1]-1,y))*3+freq.phraseScore(get_phrase2(x[1]-1,y))*3
+				score=freq.phraseScore(get_phrase(x[1]-1,y))*3
 			else:
-				score=freq.phraseScore(get_phrase1(x[1]-1,y))+freq.phraseScore(get_phrase2(x[1]-1,y))
-			if(score!=0):
+				score=freq.phraseScore(get_phrase(x[1]-1,y))	
+			if(score>0):
 				ans=ans+[[score,y]]
-	ans.sort(reverse=True)
-	i=0
-	while(i<3):
-		if(i==len(ans)):
+		if(len(ans)==0):
+			for y in intpronoun:
+				score=0
+				if(y==x[0]):
+					score=freq.phraseScore(get_phrase1(x[1]-1,y))*3+freq.phraseScore(get_phrase2(x[1]-1,y))*3
+				else:
+					score=freq.phraseScore(get_phrase1(x[1]-1,y))+freq.phraseScore(get_phrase2(x[1]-1,y))
+				if(score>0):
+					ans=ans+[[score,y]]
+		ans.sort(reverse=True)
+		i=0
+		while(i<3):
+			if(i==len(ans)):
 				break
-		if(ans[i][1]==x[0]):
-			break
-		ans1=ans1+[ans[i][1]]
-		i+=1
-	if(len(ans1)==0):
-		continue
-	print([x[1],x[0],ans1])
-	#tempans=tempans+[[x[1]-1,ans1]]
+			if(ans[i][1]==x[0]):
+				break
+			ans1=ans1+[ans[i][1]]
+			i+=1
+		if(len(ans1)==0):
+			continue
+		#tempans=tempans+[[x[1]-1,ans1]]
+		print([x[1],x[0],ans1])
 # tempans.sort()
 # j=0
 # i=0
@@ -139,5 +124,4 @@ for x in listverb:
 # 	j+=1
 # 	i+=1
 # print(ANS)
-
 	
