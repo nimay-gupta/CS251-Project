@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="UTF-8">
+	<style>
+		button {
+			
+			font-size: 20px;
+		}
+		textarea {
+			font-size: 20px;
+		}
+	</style>
+	
+</head>
+
+<body>
+
+	<center><textarea id="source" rows="10" cols="100"></textarea></center>
+	<br>
+	<p id="result"></p>
+	
+
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script>
+	if ( document.addEventListener ) { // if addEventListener provided
+    this.addEvent = function(elem, type, fn) {
+        elem.addEventListener(type, fn, false);
+        return fn;
+    };
+
+    this.removeEvent = function(elem, type, fn) {
+        elem.removeEventListener(type, fn, false);
+    };
+} else if ( document.attachEvent ) { // if attachEvent provided
+    this.addEvent = function(elem, type, fn) {
+        var bound = function() {
+            return fn.apply(elem, arguments);
+        };
+        elem.attachEvent("on" + type, bound);
+        return bound;
+    };
+
+    this.removeEvent = function (elem, type, fn) {
+        elem.detachEvent("on" + type, fn);
+    };
+}
+
+addEvent(document.getElementById("source"), "keydown", function(e){
+	if(e.keyCode == 190 || e.keyCode == 191 || e.keyCode == 49){
+		var x = input.split(/[.]/);
+		var input = $('#source').val();
+		
+		in = x[num];
+		num++;
+
+		
+		$.ajax({
+			url: '{% url 'get_response' %}',
+			data: {
+				'inputValue': in
+			},
+			dataType: 'html',
+			success: function (info) {
+				var result="";
+				var data = $.parseJSON(info);
+				console.log(data);
+				var text=in;
+				var words = text.split(' ');
+				console.log(words);
+				
+				for(var i=0; i<words.length; i++){
+					var w=words[i];
+					
+					console.log(w);
+					try{
+						if(data[w].length!=0){
+							var column = data[w][0];
+							
+							sgst[w] = data[w].slice(1,);
+						}
+						else{
+							result=result+" "+w;
+						}
+					}
+					catch(err){
+						result=result+" "+w;
+					}
+				}
+				if(e.keyCode==191){
+					document.getElementById("result").innerHTML += (res+'?');
+				}
+				else if (e.keyCode==190){
+					document.getElementById("result").innerHTML += (res+'.');
+				}
+				else{
+					document.getElementById("result").innerHTML += (res+'!');
+				}
+			}
+		});
+		
+	}
+});
+
+</script>
+
+
+
+<script>
+	var num=0;
+</script>
+
+</html>
