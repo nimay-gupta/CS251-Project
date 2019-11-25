@@ -5,3 +5,9 @@ https://medium.com/@pranavbhatia_26901/create-your-own-e-book-dictionary-using-p
 http://www.nltk.org/howto/wordnet.html
 https://www.nltk.org/book/ch02.html
 http://www.idc.iitb.ac.in/about/lingo.html
+https://stackoverflow.com/questions/42322902/how-to-get-parse-tree-using-python-nltk
+https://stackoverflow.com/questions/3753021/using-nltk-and-wordnet-how-do-i-convert-simple-tense-verb-into-its-present-pas
+https://stackoverflow.com/questions/49100615/nltk-detecting-whether-a-sentence-is-interogative-or-not
+https://www.english-grammar-revolution.com/list-of-prepositions.html
+https://phrasefinder.io/search?query=what%20do%20you%20want&corpus=eng-us
+https://www.gingersoftware.com/content/grammar-rules/adjectives/order-of-adjectives/
