@@ -73,9 +73,16 @@ index=0
 ans=[]
 i=0
 while(i<len(sentence)):
+	if(sentence[i]=='i'):
+		ans=ans+[[i+1,sentence[i],[getlowercase1(sentence[i])]]]
+		i+=1
+		continue
+	if(sentence[i]=='I'):
+		i+=1
+		continue
 	if(i==0):
 		if(lowercase1(sentence[i])):
-			if(i+1==listnoun[index][1]):
+			if(index<len(listnoun) and i+1==listnoun[index][1]):
 				index+=1
 			i+=1
 			continue
