@@ -37,7 +37,6 @@ def article(word):
             return article
 
 sentence = "I am a uncle. I ate the apple in a morning."
-print(sentence)
 
 puncts = ['.', '!', ',', ';', '"', "'", '(', ')', '-', '[', ']', '{', '}', '?', '/', ':', '@', '&']
 
@@ -56,6 +55,10 @@ for i in range(len(WORDS)):
         f2 = response.json()[0]["score"]
         #print(i+1," ",f1," ",f2)
         if(f2 > 7*f1):
-            art = "the"
-        if(art != WORDS[i]):
-            print([i+1,WORDS[i],[art]])
+            best = "the"
+            out = [best, art]
+        else:
+            best = art
+            out = [best, "the"]
+        if(best != WORDS[i]):
+            print([i+1,WORDS[i],out])
